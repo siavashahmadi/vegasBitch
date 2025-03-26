@@ -1,13 +1,66 @@
-body {
-  margin: 0;
-  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Oxygen',
-    'Ubuntu', 'Cantarell', 'Fira Sans', 'Droid Sans', 'Helvetica Neue',
-    sans-serif;
-  -webkit-font-smoothing: antialiased;
-  -moz-osx-font-smoothing: grayscale;
+@import url('https://fonts.googleapis.com/css2?family=Orbitron:wght@400;500;600;700;800;900&family=Rajdhani:wght@300;400;500;600;700&display=swap');
+
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  body {
+    @apply bg-cyber-black text-white m-0 font-sans;
+    background: linear-gradient(to bottom, #0D0D0D, #1A1A2E);
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+  }
+
+  ::-webkit-scrollbar {
+    width: 5px;
+  }
+
+  ::-webkit-scrollbar-track {
+    @apply bg-cyber-black;
+  }
+
+  ::-webkit-scrollbar-thumb {
+    @apply bg-cyber-pink rounded-full;
+  }
 }
 
-code {
-  font-family: source-code-pro, Menlo, Monaco, Consolas, 'Courier New',
-    monospace;
+@layer components {
+  .cyber-btn {
+    @apply px-6 py-2 relative border-2 border-cyber-pink text-cyber-pink font-bold overflow-hidden
+           transition-all duration-300 hover:text-white hover:shadow-neon-pink;
+  }
+  
+  .cyber-btn:before {
+    @apply content-[''] absolute top-0 left-0 w-full h-full bg-cyber-pink -z-10
+           transform scale-x-0 origin-right transition-transform duration-300;
+  }
+  
+  .cyber-btn:hover:before {
+    @apply transform scale-x-100 origin-left;
+  }
+
+  .glass-panel {
+    @apply bg-cyber-dark/30 backdrop-blur-glass border border-cyber-blue/20 rounded-lg;
+  }
+
+  .neon-text {
+    @apply relative;
+    text-shadow: 0 0 5px currentColor, 0 0 10px currentColor;
+  }
+}
+
+@layer utilities {
+  .animate-pulse-slow {
+    animation: pulse 3s cubic-bezier(0.4, 0, 0.6, 1) infinite;
+  }
+  
+  @keyframes pulse {
+    0%, 100% {
+      opacity: 1;
+    }
+    50% {
+      opacity: 0.5;
+    }
+  }
 }

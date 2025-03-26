@@ -1,46 +1,67 @@
-# Getting Started with Create React App
+# 🎰 VEGAS-BITCH: THE ULTIMATE TRIP COMPANION 🎰
 
-This project was bootstrapped with [Create React App](https://github.com/facebook/create-react-app).
+![vegas-baby](https://media.giphy.com/media/l0MYt5jPR6QX5pnqM/giphy.gif)
 
-## Available Scripts
+## 🔥 WHAT HAPPENS IN VEGAS STAYS IN THIS APP 🔥
 
-In the project directory, you can run:
+Welcome to the most badass Vegas trip planner ever created. This isn't your grandma's travel app - this is cyberpunk luxury meets Sin City excess, all wrapped in a neon-drenched interface that would make Tony Stark jealous.
 
-### `npm start`
+## 👾 FEATURES THAT SLAP 👾
 
-Runs the app in the development mode.\
-Open [http://localhost:3000](http://localhost:3000) to view it in the browser.
+- **Epic Countdown Timer** - Know exactly how many seconds until we're popping bottles
+- **Real-time Vegas Weather** - So you know whether to pack the mesh or leather
+- **Interactive Timeline** - Never miss a reservation or pool party again
+- **Traveler Profiles** - Keep track of who's coming and who's tapping out early (weak)
+- **3D Vegas Map** - Navigate the Strip like a local, not a tourist
+- **Nightlife Mode** - Dark UI for clubs, drink counter, and one-tap emergency "WHERE TF ARE YOU?" button
 
-The page will reload if you make edits.\
-You will also see any lint errors in the console.
+## 🚀 GETTING THIS PARTY STARTED 🚀
 
-### `npm test`
+```bash
+# Clone this bad boy
+git clone https://github.com/yourusername/vegas-bitch.git
 
-Launches the test runner in the interactive watch mode.\
-See the section about [running tests](https://facebook.github.io/create-react-app/docs/running-tests) for more information.
+# Get in there
+cd vegas-bitch
 
-### `npm run build`
+# Install the essentials
+npm install
 
-Builds the app for production to the `build` folder.\
-It correctly bundles React in production mode and optimizes the build for the best performance.
+# Fire it up
+npm start
+```
 
-The build is minified and the filenames include the hashes.\
-Your app is ready to be deployed!
+## 💸 DEVELOPMENT TOOLS 💸
 
-See the section about [deployment](https://facebook.github.io/create-react-app/docs/deployment) for more information.
+This app is built with:
+- **React + TypeScript** - For that enterprise-grade stability when you're 6 drinks in
+- **Framer Motion** - Animations smoother than your best pickup line
+- **TailwindCSS** - Styling that flexes harder than the guys at Encore Beach Club
+- **Three.js** - 3D effects that will blow your mind (even without substances)
 
-### `npm run eject`
+## 🎮 HOW TO USE THIS MASTERPIECE 🎮
 
-**Note: this is a one-way operation. Once you `eject`, you can’t go back!**
+1. **Log in** with your assigned degenerate credentials
+2. **Sync** your itinerary with the group
+3. **Customize** your profile with your party preferences
+4. **Share** your location when the squad inevitably gets separated
+5. **Track** expenses before they destroy your credit score
 
-If you aren’t satisfied with the build tool and configuration choices, you can `eject` at any time. This command will remove the single build dependency from your project.
+## 🏆 WHO MADE THIS? 🏆
 
-Instead, it will copy all the configuration files and the transitive dependencies (webpack, Babel, ESLint, etc) right into your project so you have full control over them. All of the commands except `eject` will still work, but they will point to the copied scripts so you can tweak them. At this point you’re on your own.
+The legends who are going to absolutely crush Vegas, that's who. 
 
-You don’t have to ever use `eject`. The curated feature set is suitable for small and middle deployments, and you shouldn’t feel obligated to use this feature. However we understand that this tool wouldn’t be useful if you couldn’t customize it when you are ready for it.
+## ⚠️ WARNINGS & DISCLAIMERS ⚠️
 
-## Learn More
+- This app does not prevent hangovers
+- We cannot be held responsible for bad decisions made after 2AM
+- The "Find Me A Wedding Chapel" feature is disabled by default
+- What happens in the app logs stays in the app logs
 
-You can learn more in the [Create React App documentation](https://facebook.github.io/create-react-app/docs/getting-started).
+## 📱 SCREENSHOTS 📱
 
-To learn React, check out the [React documentation](https://reactjs.org/).
+*Screenshots coming soon (if we remember to take them)*
+
+---
+
+**VEGAS-BITCH**: *Because planning should be as epic as the trip itself.*
