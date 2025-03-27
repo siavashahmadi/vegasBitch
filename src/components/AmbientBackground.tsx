@@ -137,9 +137,9 @@ const AmbientBackground: React.FC<AmbientBackgroundProps> = ({ className = '' })
       }} />
       
       {/* Vegas time display (small and discreet) */}
-      <div className="absolute top-16 right-4 text-sm text-white bg-black/50 px-3 py-1.5 rounded-full backdrop-blur-sm border border-cyber-blue/30 z-40 shadow-neon-blue">
+      {/* <div className="absolute top-16 right-4 text-sm text-white bg-black/50 px-3 py-1.5 mt-6 rounded-full backdrop-blur-sm border border-cyber-blue/30 z-40 shadow-neon-blue hidden md:block">
         Vegas time: {vegasTime.toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit', hour12: true })}
-      </div>
+      </div> */}
     </div>
   );
 };

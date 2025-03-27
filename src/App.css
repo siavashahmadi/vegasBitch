@@ -337,3 +337,32 @@
     transform: translateX(-1px);
   }
 }
+
+/* Glass input fields */
+.glass-input {
+  background: rgba(26, 26, 46, 0.4);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  border-radius: 4px;
+  color: white;
+  padding: 0.5rem 0.75rem;
+  font-size: 0.9rem;
+  transition: all 0.3s ease;
+  backdrop-filter: blur(4px);
+  -webkit-backdrop-filter: blur(4px);
+}
+
+.glass-input:focus {
+  outline: none;
+  border-color: rgba(5, 217, 232, 0.5);
+  box-shadow: 0 0 0 2px rgba(5, 217, 232, 0.2);
+}
+
+.glass-input::placeholder {
+  color: rgba(255, 255, 255, 0.5);
+}
+
+/* Glass select */
+.glass-input option {
+  background-color: #1a1a2e;
+  color: white;
+}

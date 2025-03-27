@@ -8,7 +8,40 @@ interface WeatherData {
   windSpeed: number;
   highTemp: number;
   lowTemp: number;
+  precipitation: number;
+  weatherCode: number;
+  apparentTemperature: number;
+  uvIndex: number;
 }
+
+// WMO Weather interpretation codes (WW)
+const getConditionFromWMO = (code: number): 'sunny' | 'cloudy' | 'rainy' | 'stormy' => {
+  // Clear sky
+  if (code === 0) return 'sunny';
+  // Mainly clear, partly cloudy, and overcast
+  if (code >= 1 && code <= 3) return 'cloudy';
+  // Fog and depositing rime fog
+  if (code === 45 || code === 48) return 'cloudy';
+  // Drizzle: Light, moderate, and dense intensity
+  if (code >= 51 && code <= 55) return 'rainy';
+  // Freezing Drizzle: Light and dense intensity
+  if (code === 56 || code === 57) return 'rainy';
+  // Rain: Slight, moderate and heavy intensity
+  if (code >= 61 && code <= 65) return 'rainy';
+  // Freezing Rain: Light and heavy intensity
+  if (code === 66 || code === 67) return 'rainy';
+  // Snow and snow grains
+  if ((code >= 71 && code <= 75) || code === 77) return 'rainy';
+  // Rain showers: Slight, moderate, and violent
+  if (code >= 80 && code <= 82) return 'rainy';
+  // Snow showers slight and heavy
+  if (code === 85 || code === 86) return 'rainy';
+  // Thunderstorm: Slight, moderate, with hail
+  if (code === 95 || code === 96 || code === 99) return 'stormy';
+  
+  // Default
+  return 'sunny';
+};
 
 const WeatherWidget: React.FC = () => {
   const [weather, setWeather] = useState<WeatherData>({
@@ -17,31 +50,85 @@ const WeatherWidget: React.FC = () => {
     humidity: 20,
     windSpeed: 5,
     highTemp: 88,
-    lowTemp: 65
+    lowTemp: 65,
+    precipitation: 0,
+    weatherCode: 0,
+    apparentTemperature: 80,
+    uvIndex: 8
   });
   
-  const [loading, setLoading] = useState<boolean>(false);
+  const [loading, setLoading] = useState<boolean>(true);
   const [time, setTime] = useState<Date>(new Date());
+  const [error, setError] = useState<string | null>(null);
+  const [forecast, setForecast] = useState<{day: string, temp: number, condition: string}[]>([]);
 
-  // In a real application, this would fetch real weather data from an API
+  // Fetch real weather data from Open-Meteo API
   useEffect(() => {
-    // Mock a weather data fetch
-    setLoading(true);
+    const fetchWeatherData = async () => {
+      try {
+        setLoading(true);
+        // Las Vegas coordinates
+        const lat = 36.17;
+        const lon = -115.14;
+        
+        // Open-Meteo API URL with required parameters
+        const url = `https://api.open-meteo.com/v1/forecast?latitude=${lat}&longitude=${lon}&current=temperature_2m,relative_humidity_2m,apparent_temperature,precipitation,weather_code,wind_speed_10m&daily=weather_code,temperature_2m_max,temperature_2m_min,uv_index_max&temperature_unit=fahrenheit&wind_speed_unit=mph&precipitation_unit=inch&timezone=America%2FLos_Angeles`;
+        
+        const response = await fetch(url);
+        const data = await response.json();
+        
+        if (!response.ok) {
+          throw new Error(data.reason || 'Failed to fetch weather data');
+        }
+        
+        // Extract current weather data
+        const currentWeather = data.current;
+        const dailyWeather = data.daily;
+        
+        // Set the current weather
+        setWeather({
+          temperature: Math.round(currentWeather.temperature_2m),
+          condition: getConditionFromWMO(currentWeather.weather_code),
+          humidity: Math.round(currentWeather.relative_humidity_2m),
+          windSpeed: Math.round(currentWeather.wind_speed_10m),
+          highTemp: Math.round(dailyWeather.temperature_2m_max[0]),
+          lowTemp: Math.round(dailyWeather.temperature_2m_min[0]),
+          precipitation: currentWeather.precipitation,
+          weatherCode: currentWeather.weather_code,
+          apparentTemperature: Math.round(currentWeather.apparent_temperature),
+          uvIndex: Math.round(dailyWeather.uv_index_max[0])
+        });
+        
+        // Create 3-day forecast
+        const futureForecast = [];
+        const daysOfWeek = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'];
+        
+        for (let i = 1; i < 4; i++) {
+          if (dailyWeather.time[i]) {
+            const date = new Date(dailyWeather.time[i]);
+            futureForecast.push({
+              day: daysOfWeek[date.getDay()],
+              temp: Math.round(dailyWeather.temperature_2m_max[i]),
+              condition: getConditionFromWMO(dailyWeather.weather_code[i])
+            });
+          }
+        }
+        
+        setForecast(futureForecast);
+        setLoading(false);
+      } catch (err) {
+        console.error('Error fetching weather data:', err);
+        setError('Could not load weather data');
+        setLoading(false);
+      }
+    };
     
-    const mockFetch = setTimeout(() => {
-      // This is sample data - in a real app, you'd fetch from a weather API
-      setWeather({
-        temperature: 82,
-        condition: 'sunny',
-        humidity: 20,
-        windSpeed: 5,
-        highTemp: 88,
-        lowTemp: 65
-      });
-      setLoading(false);
-    }, 1500);
+    fetchWeatherData();
     
-    return () => clearTimeout(mockFetch);
+    // Refresh weather data every 30 minutes
+    const weatherInterval = setInterval(fetchWeatherData, 30 * 60 * 1000);
+    
+    return () => clearInterval(weatherInterval);
   }, []);
   
   // Update the time every minute
@@ -49,15 +136,11 @@ const WeatherWidget: React.FC = () => {
     const timer = setInterval(() => {
       // Set time to Vegas time (PST/PDT)
       const vegasTime = new Date();
-      // Adjust to Vegas timezone (UTC-7 or UTC-8 depending on daylight savings)
-      // This is simplified - a real app would use a timezone library
-      vegasTime.setHours(vegasTime.getHours() - 7);
       setTime(vegasTime);
     }, 60000);
     
     // Set initial time
     const initialVegasTime = new Date();
-    initialVegasTime.setHours(initialVegasTime.getHours() - 7);
     setTime(initialVegasTime);
     
     return () => clearInterval(timer);
@@ -188,6 +271,42 @@ const WeatherWidget: React.FC = () => {
     }
   };
 
+  // Get weather description based on WMO code
+  const getWeatherDescription = (code: number): string => {
+    if (code === 0) return "Clear sky";
+    if (code === 1) return "Mainly clear";
+    if (code === 2) return "Partly cloudy";
+    if (code === 3) return "Overcast";
+    if (code === 45 || code === 48) return "Foggy";
+    if (code >= 51 && code <= 55) return "Drizzle";
+    if (code === 56 || code === 57) return "Freezing drizzle";
+    if (code >= 61 && code <= 65) return "Rain";
+    if (code === 66 || code === 67) return "Freezing rain";
+    if (code >= 71 && code <= 75) return "Snow";
+    if (code === 77) return "Snow grains";
+    if (code >= 80 && code <= 82) return "Rain showers";
+    if (code === 85 || code === 86) return "Snow showers";
+    if (code === 95) return "Thunderstorm";
+    if (code === 96 || code === 99) return "Thunderstorm with hail";
+    return "Unknown";
+  };
+
+  // Get forecast weather icon
+  const getForecastIcon = (condition: string) => {
+    switch (condition) {
+      case 'sunny':
+        return "☀️";
+      case 'cloudy':
+        return "☁️";
+      case 'rainy':
+        return "🌧️";
+      case 'stormy':
+        return "⚡";
+      default:
+        return "☀️";
+    }
+  };
+
   return (
     <motion.div
       className={`glass-panel overflow-hidden w-full max-w-sm bg-gradient-to-br ${getBackgroundGradient()}`}
@@ -205,7 +324,8 @@ const WeatherWidget: React.FC = () => {
                 minute: '2-digit',
                 hour12: true,
                 month: 'short',
-                day: 'numeric'
+                day: 'numeric',
+                timeZone: 'America/Los_Angeles'
               })}
             </p>
           </div>
@@ -223,9 +343,24 @@ const WeatherWidget: React.FC = () => {
               transition={{ duration: 1, repeat: Infinity }}
             />
           </div>
+        ) : error ? (
+          <div className="flex flex-col justify-center items-center h-40 text-center">
+            <div className="text-cyber-pink mb-2">
+              <svg xmlns="http://www.w3.org/2000/svg" className="h-8 w-8" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" />
+              </svg>
+            </div>
+            <p className="text-cyber-pink">{error}</p>
+            <button 
+              className="mt-3 cyber-btn text-xs"
+              onClick={() => window.location.reload()}
+            >
+              RETRY
+            </button>
+          </div>
         ) : (
           <>
-            <div className="flex items-center justify-between mb-6">
+            <div className="flex items-center justify-between mb-4">
               <div>
                 <div className="flex items-end">
                   {weather.temperature.toString().split('').map((digit, index) => (
@@ -247,7 +382,10 @@ const WeatherWidget: React.FC = () => {
                     °
                   </div>
                 </div>
-                <div className="flex items-center text-sm mt-3">
+                <div className="text-xs text-white/80 mt-1">
+                  {getWeatherDescription(weather.weatherCode)}
+                </div>
+                <div className="flex items-center text-sm mt-2">
                   <span className="text-cyber-green mr-2">H: {weather.highTemp}°</span>
                   <span className="text-cyber-pink">L: {weather.lowTemp}°</span>
                 </div>
@@ -255,7 +393,7 @@ const WeatherWidget: React.FC = () => {
               {getWeatherIcon()}
             </div>
             
-            <div className="grid grid-cols-2 gap-4 text-sm">
+            <div className="grid grid-cols-2 gap-4 text-sm mb-4">
               <div className="bg-cyber-dark/40 p-2 rounded">
                 <div className="text-cyber-blue mb-1">Humidity</div>
                 <div className="text-white">{weather.humidity}%</div>
@@ -263,6 +401,28 @@ const WeatherWidget: React.FC = () => {
               <div className="bg-cyber-dark/40 p-2 rounded">
                 <div className="text-cyber-blue mb-1">Wind</div>
                 <div className="text-white">{weather.windSpeed} mph</div>
+              </div>
+              <div className="bg-cyber-dark/40 p-2 rounded">
+                <div className="text-cyber-blue mb-1">Feels Like</div>
+                <div className="text-white">{weather.apparentTemperature}°</div>
+              </div>
+              <div className="bg-cyber-dark/40 p-2 rounded">
+                <div className="text-cyber-blue mb-1">UV Index</div>
+                <div className="text-white">{weather.uvIndex}</div>
+              </div>
+            </div>
+            
+            {/* 3-Day Forecast */}
+            <div className="mt-4 pt-3 border-t border-cyber-dark">
+              <div className="text-xs text-cyber-blue mb-2">3-DAY FORECAST</div>
+              <div className="flex justify-between">
+                {forecast.map((day, index) => (
+                  <div key={index} className="text-center px-2">
+                    <div className="text-xs text-white mb-1">{day.day}</div>
+                    <div className="text-lg mb-1">{getForecastIcon(day.condition)}</div>
+                    <div className="text-sm text-white">{day.temp}°</div>
+                  </div>
+                ))}
               </div>
             </div>
           </>
